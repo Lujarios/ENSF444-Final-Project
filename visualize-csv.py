@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 from collections import Counter
 
 # Replace 'your_file.csv' with the path to your CSV file
-df = pd.read_csv('data/ml_data.csv')
+df = pd.read_csv('./data/ml_data.csv')
 
 # Define a set of stop words to ignore (all in lowercase for comparison)
 stopwords = {"a", "the", "this", "of", "to", "or", "and"}
