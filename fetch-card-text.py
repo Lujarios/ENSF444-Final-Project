@@ -1,5 +1,40 @@
 import requests
 
+def fetch_cards(query=""):
+    params = {
+        "q":query,
+        "order":"name", 
+        "unique":"cards"}
+    
+    url = "https://api.scryfall.com/cards/search"
+    texts = []  # List to store the oracle text of blue cards
+
+    while url:
+        response = requests.get(url, params=params)
+        if response.status_code != 200:
+            print("Error fetching data:", response.status_code)
+            break
+
+        data = response.json()
+        for card in data.get("data", []):
+            # Cards contain a certain type. This will just be appended to the beginning of the oracle text
+            type_line = card.get("type_line")
+            oracle_text = card.get("oracle_text") if card.get("oracle_text") != None else ""
+
+            # Some cards may not have oracle_text (e.g., tokens or cards with no text)
+            card_text = type_line + "\n" + oracle_text
+            if card_text:
+                texts.append(card_text)
+        
+        # If there are more pages, use the provided next_page URL.
+        if data.get("has_more"):
+            url = data.get("next_page")
+            params = {}  # next_page URL already includes the query parameters.
+        else:
+            url = None
+
+    return texts
+
 def fetch_blue_cards():
     # Base URL for Scryfall card search
     url = "https://api.scryfall.com/cards/search"
@@ -172,27 +207,14 @@ def fetch_white_cards():
 
 def main():
 
-    colors = ["blue","black", "red", "green", "white"]
+    colors = ["blue", "black", "red", "green", "white"]
 
     for color in colors:
         print(f"Fetching text for {color} cards...")
         color_card_texts = []
-        if color == "black":
-            color_card_texts = fetch_black_cards()
-            output_filename = "black_cards_texts.txt"
-        elif color == "red":
-            color_card_texts = fetch_red_cards()
-            output_filename = "red_cards_texts.txt"
-        elif color == "green":
-            color_card_texts = fetch_green_cards()
-            output_filename = "green_cards_texts.txt"
-        elif color == "white":
-            color_card_texts = fetch_white_cards()
-            output_filename = "white_cards_texts.txt"
-        elif color == "blue":
-            color_card_texts = fetch_blue_cards()
-            output_filename = "blue_cards_texts.txt"
-            
+        color_card_texts = fetch_cards(query=f"c:{color}")
+        output_filename = f"{color}_cards_texts.txt"
+        
         output_filepath = "data/"
         output_filename = output_filepath + output_filename  
         with open(output_filename, "w", encoding="utf-8") as file:
