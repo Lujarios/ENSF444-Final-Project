@@ -1,6 +1,14 @@
 import requests
 
 def fetch_mono_color_cards(colour=""):
+    '''
+    Fetches all cards of a specified color from the scryfall API
+    Will only fetch mono-color cards. A.k.a., cards with multiple colors
+    will not be fetched.
+
+    Keyword Arguments:
+    colour -- the specified color
+    '''
     letter_code = {
         "blue":"U",
         "black":"B",
@@ -48,9 +56,9 @@ def fetch_mono_color_cards(colour=""):
     return texts
 
 def main():
-
+    # colors to be fetched
     colors = ["blue", "black", "red", "green", "white"]
-
+    # iterate through each color, fetching and storing them
     for color in colors:
         print(f"Fetching text for {color} cards...")
         color_card_texts = []
